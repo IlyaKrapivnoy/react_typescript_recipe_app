@@ -13,15 +13,31 @@ function App() {
   useEffect(() => {
     (async () => {
       const query = encodeURIComponent(recipeSearch)
-      const resonse = await searchForRecipes(query)
-      setRecipesFound(resonse)
+      if(query) {
+        const resonse = await searchForRecipes(query)
+        setRecipesFound(resonse)
+      }
     })();
-  })
+  }, [recipeSearch])
+
+  const search = (event: any) => {
+    event.preventDefault();
+    const form = event.target;
+    console.log(form)
+    // const input = form.querySelector('#searchText')
+  }
 
   return (
-     <div className="App">
-       <h1>Recipe Search App</h1>
-     </div>
+    <div className="App">
+      <h1>Recipe Search App</h1>
+      <form 
+        className="searchForm"
+        onSubmit={event => search(event)}
+      >
+        <input id="searchText" type="text"/>
+        <button>Search</button>
+      </form>
+    </div>
   );
 }
 
