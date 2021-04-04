@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -10,10 +10,17 @@ function App() {
     return (await result.json()).results;
   }
 
+  useEffect(() => {
+    (async () => {
+      const query = encodeURIComponent(recipeSearch)
+      const resonse = await searchForRecipes(query)
+      setRecipesFound(resonse)
+    })
+  })
 
   return (
      <div className="App">
-
+       <h1>Recipe Search App</h1>
      </div>
   );
 }
