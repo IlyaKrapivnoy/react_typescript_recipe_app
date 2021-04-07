@@ -9,6 +9,14 @@ function App() {
     const result = await fetch('http://localhost:3001/?search=${query}')
     return (await result.json()).results;
   }
+  
+  const search = (event: any) => {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const input = form.querySelector('#searchText') as HTMLInputElement;
+    setRecipeSearch(input.value);
+    input.value = '';
+  };
 
   useEffect(() => {
     (async () => {
@@ -19,13 +27,6 @@ function App() {
       }
     })();
   }, [recipeSearch])
-
-  const search = (event: any) => {
-    event.preventDefault();
-    const form = event.target;
-    console.log(form)
-    // const input = form.querySelector('#searchText')
-  }
 
   return (
     <div className="App">
