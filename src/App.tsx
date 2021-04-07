@@ -1,16 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
+import logo from './logo.svg';
 import './App.css';
+import { StringifyOptions } from 'node:querystring';
+import { queryAllByAltText } from '@testing-library/dom';
+import { IRecipe } from './iRecipe';
+import Recipe from './RecipeComponent';
+import RecipeComponent from './RecipeComponent';
 
 function App() {
-  const [recipesFound, setRecipesFound] = useState([]);
+  const [recipesFound, setRecipesFound] = useState<IRecipe[]>([]);
   const [recipeSearch, setRecipeSearch] = useState('');
 
-  const searchForRecipes = async (query: string): Promise<any> => {
-    const result = await fetch('http://localhost:3001/?search=${query}')
+  const searchForRecipes = async (query: String): Promise<IRecipe[]> => {
+    const result = await fetch(`http://localhost:3001/?search=${query}`)
     return (await result.json()).results;
-  }
-  
-  const search = (event: any) => {
+  };
+
+  useEffect(() => {
+    (async () => {
+      const query = encodeURIComponent(recipeSearch);
+      const response = await searchForRecipes(query);
+      setRecipesFound(response);
+    })();
+  }, [recipeSearch]);
+
+  const search = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const input = form.querySelector('#searchText') as HTMLInputElement;
@@ -18,26 +32,20 @@ function App() {
     input.value = '';
   };
 
-  useEffect(() => {
-    (async () => {
-      const query = encodeURIComponent(recipeSearch)
-      if(query) {
-        const resonse = await searchForRecipes(query)
-        setRecipesFound(resonse)
-      }
-    })();
-  }, [recipeSearch])
-
   return (
     <div className="App">
       <h1>Recipe Search App</h1>
-      <form 
-        className="searchForm"
-        onSubmit={event => search(event)}
-      >
-        <input id="searchText" type="text"/>
+      <form className="searchForm" onSubmit={event => search(event)} >
+        <input id="searchText" type="text" />
         <button>Search</button>
       </form>
+      {recipeSearch && <p>Results for {recipeSearch}...</p>}
+      <div className="recipes-container">
+        {recipesFound.length &&
+          recipesFound.map(recipe =>
+            (<RecipeComponent key={recipe.href} recipe={recipe}></RecipeComponent>))
+        }
+      </div>
     </div>
   );
 }
